@@ -363,7 +363,7 @@ Javascript → 동작
 
 ```
 
-[inline.jfif](Web%200801-%2027b42b9be10c454ca054b15616dcac7c/inline.jfif)
+[inline vs block](Web/inline.jpg)
 
 ### CSS Position
 
