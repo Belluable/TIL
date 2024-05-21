@@ -93,6 +93,10 @@ function f(){
 - 메모리에 더 가까이 올라가니까 더 빠름
 - 빠르기: const > let > var
 
+freshness
+
+- 흙당근을 쓰려면 씻어야지 바로 쓸 수 없음
+
 
 
 ### 연산자
@@ -123,4 +127,20 @@ y = ++x;  // y: 3, x = 3
 let a = 1, b = 2;
 const c = (a++, b++);  // c = b = 2
 ```
+
+```bash
+# nodemon을 global하게 깔기
+npm i nodemon -g
+
+# nodemon: deamon이어서 안꺼짐
+# -d 붙이면: develop할 때만 씀
+```
+
+```jsx
+// void 연산
+d = void(c = a + b)  // 평가/실행 후 undefined 반환
+```
+
+- falsy: undefined, null, false, 0, NaN, ‘’
+- truthy: ‘ ‘(빈칸이 있으면 값이 있다고 봄)
 
