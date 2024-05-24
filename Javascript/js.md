@@ -33,7 +33,7 @@ x = 1;
 - 변수 = 선언 + 식별자 + 타입 + 값 + 스코프
     - 스코프
         - 전역 스코프: 전 지역에서 사용 가능한 변수 (globalThis)
-        - 함수 스코프: 특정 함수 내에서 사용 가능한 변수 (var, function)
+        - 함수 스코프: 특정 함수 내에서 사용 가능한 변수 (var, function<f.o>)
         - 블록 스코프: 특정 블록 내에서 사용 가능한 변수 (const, let)
     - 타입
         - 값이 저장될 때 정해짐
@@ -79,10 +79,21 @@ function f(){
 ### stack
 
 - LIFO, 확장 안됨
+- call stack: 함수들의 집합, main → f() → f2()
 - stack pointer: 현재 위치를 계속 가르킴, stack pointer를 올리면 pop, 내리면 push
 - program counter: 다음에 일어날 일을 확인
-- call stack: 함수들의 집합, main → f() → f2()
 - 주어진 메모리를 넘으면 stack overflow → limit register
+
+### call stack
+
+- 함수 호출을 관리하는 데이터 구조
+- 프로그램이 함수 호출을 할 때마다 그 함수의 정보(예: 함수의 매개변수, 로컬 변수, 반환 주소 등)가 스택에 추가 (push)
+- 함수가 완료되면 해당 정보는 스택에서 제거 (pop)
+
+### call stack pointer
+
+- 현재 콜 스택의 최상단을 가리키는 포인터 = 현재 실행 중인 함수 호출의 정보를 가리킴
+- 콜 스택 포인터는 함수가 호출될 때마다 스택의 새로운 위치를 가리키도록 업데이트되고, 함수가 종료되면 이전 위치로 돌아감
 
 ### constant pool
 
@@ -476,6 +487,12 @@ const { name: target } = user; // SyntaxError: Identifier 'target' has already b
 ### **Array / Iterator Destructuring**
 
 ```jsx
+// 아래 두개가 같은 뜻이나 실무에서는 destructuring 한 코드로 사용
+const a = arr[0];
+const [a] = arr;  // destructuring
+```
+
+```jsx
 // swap
 const [a, b] = [1, 2];
 [a, b] = [b, a];  // a: 2, b: 1
@@ -559,7 +576,11 @@ console.log(user2);       // { id: 1, name: 'hong', age: 30 }
 
 ### Arguments Destructuring
 
+함수가 갖는거
+
 ```jsx
+// user2 = { id: 1, name: 'hong', age: 30 };
+
 function print({ id, name }) {
   // 객체를 인수로 받음
   console.log(`${id}: ${name}`);
@@ -571,6 +592,46 @@ function fn({ a, b }) {
   console.log(a, b);
 }
 fn({ a: 1, b: 2 }); // 1 2
+```
+
+```jsx
+function fn2(...args) {
+    console.log('arguments =', arguments);
+}
+fn2(1, 2, 3); // arguments = [Arguments] { '0': 1, '1': 2, '2': 3 }
+```
+
+```jsx
+// 함수 선언문 statement
+function f() { return 1; }
+
+// 함수 표현식 expression 값이 됨 <f.o> 함수 테이블에 생성
+var f = function () { return 1; }
+
+// 변수 테이블에 생성
+const f = () => 1;
+```
+
+```jsx
+// 다시 볼것 
+// user2 = { id: 1, name: 'hong', age: 30 };
+
+const { name: n, age = 30 } = { name: 'Lee' }; // n = 30, age = Lee
+const { age2 = 30 } = { name: 'Park', age2: 20 }; // age2 = 20
+
+const fn3 = ({ age }) => age;
+const { age2: age3 = fn3(user2) } = { age22: 40 };
+const { age2: newage } = { age2: 40 };
+
+console.log(age2); // age2는 위에 선언된거 가져옴
+console.log(fn3(user2)); // user2.age
+console.log(age3); // {age22 = 40}에 age2가 없어서 fn3(user2)의 결과값인 30이 들어감
+console.log(newage); // {age2 = 40}에 age2가 있어서 40이 들어감
+console.log(age22);  // ReferenceError: age22 is not defined
+```
+
+```jsx
+// entries 배열 속 배열
 ```
 
 ### Class Destructuring
@@ -594,3 +655,65 @@ const {a, b} = x;
 // const가 없으면 block - key, value
 const {id: idd, name: nm} = u;  // 변수명을 idd, nm으로 할게: idd = 1, nm = 'hong'
 ```
+
+---
+
+## 스코프와 실행컨텍스트
+
+### 스코프
+
+- global
+- function
+- block
+- module: 파일이 4개가 묶어져 있으면 각각 가지는 스코프
+
+**lexical scope**
+
+- outer lexical environment reference: 전역 밖에 있는 lexical에 있는 참조값
+    - 나한테 없는거 변수는 내 위에 outer에서 찾음
+- static scope: 바뀌지 않음 (초등학교, 고등학교) - js, 인터프리터 언어
+- dynamic scope: 어디서 불렀냐에 따라서 scope가 바뀜 - 컴파일 언어
+
+**node/browser구조** (그림 참조)
+
+call stack
+
+call stack의 포인터: stack pointer(SP), instruction pointer(IP)
+
+전역 실행 컨텍스트(global execution(실행할때 생긴다) context)(main)
+
+위에 f, f2, … 쌓임 → f2 pop
+
+### 실행 컨텍스트
+
+- 컨텍스트 = 구역
+
+**Global Object (전역 객체)**
+
+- JS runtime(engine) process 시작시 생성
+- Built-in properties & functions
+- hose object: browser
+- 전역 변수는 전역 객체에 process 종료할 때까지 존재함
+- 직접 생성(컨트롤) 못함
+- window(globalThis) 생략 가능 (window. / globalThis. 하면 전역객체로 이동)
+- var은 전역 객체에 생성, 선언 안하면 암묵적으로 var 사용
+- const, let은 전역 객체가 아닌 DER(declarative environment record)에 별도 생성
+
+**encode/ decode**
+
+- encodeURI(): 서버가 인식할 수 있는 문자를 제외하고 인코딩/디코딩
+- encodeURIComponent(): 서버가 인식하는 문자까지 다 인코딩/디코딩
+
+**var/function vs const/let**
+
+- var/function: 함수 레벨 스코프
+- const/let: 블록 레벨 스코프
+
+- 전역 코드 평가 단계 직접 그려보기 **
+    
+    ![js_2](js/2.png)
+
+    
+    ![js_3](js/3.png)
+
+    
