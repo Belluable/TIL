@@ -241,7 +241,7 @@ l = 1;
 | 비트연산자 | 기호 | True |
 | --- | --- | --- |
 | AND | & | 둘다 참 |
-| OR | | | 하나만 참 |
+| OR | \| | 하나만 참 |
 | XOR | ^ | 둘다 거짓 |
 | NOT | ~ | False |
 
@@ -275,17 +275,12 @@ isNaN(dt)     // true: date는 숫자로 저장돼 있음
 
 | 연산자 | 의미 | 사용 |
 | --- | --- | --- |
-| .(점) | 해당 주소로 가라
-키값 불러오기 | u.name ↔ u[’name’]
-object의 key 값은 모두 string 이어야함 |
+| .(점) | 해당 주소로 가라<br>키값 불러오기 | u.name ↔ u[’name’]<br>object의 key 값은 모두 string 이어야함 |
 | [](대괄호) |  | [1, 2, 3] |
 | in | 안에 있는지 확인 | ‘id’ in u ↔ u.hasOwnProperty(’id’) ↔ Reflect.has(u, ‘id’) |
-| new | 생성자
-객체 → 인스턴스 | const d = new Dog()
-: d는 Dog의 인스턴스 |
+| new | 생성자<br>객체 → 인스턴스 | const d = new Dog()<br>: d는 Dog의 인스턴스 |
 | instanceof |  | d instanceof Dog |
-| …(rest) | 배정되고 남은 값 다가져옴
-잔반처리 | function ff(a, b, …c) {} ⇒ f = (…args) |
+| …(rest) | 배정되고 남은 값 다가져옴(잔반처리) | function ff(a, b, …c) {} ⇒ f = (…args) |
 | delete | (heap에서) 삭제 | delete u.addr |
 | arr?.length | arr이 no error나 undefined면 . 해라 | Optional-Chaining (no error, undefined) |
 
@@ -1061,21 +1056,11 @@ console.log('f(3)=', f(3)); // 4
 
 | 실행되는 함수의 종류 | 브라우저 | node |
 | --- | --- | --- |
-| 함수 선언문
-
-function(){} | FunctionDeclaration에 <f.o>로 등록
-bind 한 객체
-bind하지 않았다면 전역(globalThisValue) | 좌동 |
-| 화살표 함수
-
-() => {} | bind 안 됨!
-전역(globalThisValue) | bind 안 됨!
-모듈 |
+| 함수 선언문<br>function(){} | FunctionDeclaration에 <f.o>로 등록<br>bind 한 객체<br>bind하지 않았다면 전역(globalThisValue) | 좌동 |
+| 화살표 함수<br>() => {} | bind 안 됨!<br>전역(globalThisValue) | bind 안 됨!<br>모듈 |
 | 객체/instance method | 객체 또는 instance 자신 | 좌동 |
-| 함수 선언문 Property | FunctionDeclaration에 <f.o>로 등록
-소속된 객체 | 좌동 |
-| 화살표 함수 Property
-화살표 callback 함수 | 소속된 객체의 부모 | 좌동 |
+| 함수 선언문 Property | FunctionDeclaration에 <f.o>로 등록<br>소속된 객체 | 좌동 |
+| 화살표 함수 Propert<br>화살표 callback 함수 | 소속된 객체의 부모 | 좌동 |
 
 ### 콜백 함수 (Callback function)
 
@@ -1218,7 +1203,7 @@ arr.length = 5;  // arr = [1, 2, 3, ...]
 arr.splice(1, 2);  // 1번째부터 2개 지우기 -> arr = [1, ...]
 ```
 
-### sort()
+### sort(), toSorted()
 
 ```jsx
 arr = [3, 5, 2, 7, 1];
@@ -1226,8 +1211,9 @@ arr.sort();  // 원본도 바뀜
 arr.toSorted();  // 원본은 안바뀜 -> 순수함수
 
 [...arr];  // 원본 복사 -> toSorted 없을 때
-[...arr].sort((a, b) => a > b ? -1 : 1) // DESC
-[...arr].sort((a, b) => a < b ? -1 : 1) // ASC
+[...arr].sort((a, b) => a > b ? -1 : 1); // DESC a기준 크면 왼쪽으로(-1)
+[...arr].sort((a, b) => a < b ? -1 : 1); // ASC a기준 작으면 왼쪽으로(-1)
+[...arr].sort((a, b) => a - b ); // ASC 숫자일때 가능, 문자는 안됨
 ```
 
 ### split()
@@ -1253,4 +1239,184 @@ const numbers = [1, 2, 3, 4, 5];
 
 const doubledNumbers = numbers.map(num => num * 2);
 console.log(doubledNumbers); // 출력: [2, 4, 6, 8, 10]
+```
+
+### push(), pop(), shift(), unshift()
+
+- shift(): 앞에거 뺌
+- unshift(): 앞에 추가
+- stack (LIFO): [push, pop] ↔ [unshift, shift]
+- queue (FIFO): [unshift, pop] ↔ [push, shift]
+
+```jsx
+// stack
+const stack = [];
+stack.push(1);
+stack.push(2, 3);
+console.log('🚀 ~ stack:', stack); // [1, 2, 3]
+
+const curr = stack.pop();  // 뒤에서부터 빼기
+console.log('🚀 ~ curr:', curr); // 3
+console.log('🚀 ~ stack:', stack); // [1, 2]
+
+const curr1 = stack.shift();  // 앞에서부터 빼기
+console.log('🚀 ~ curr1:', curr1); // 1
+console.log('🚀 ~ stack:', stack); // [1]
+
+// queue
+const queue = [];
+queue.unshift(1);
+queue.unshift(2, 3);  // 앞에서부터 넣기
+console.log('🚀 ~ queue:', queue); // [2, 3, 1]
+
+const curr2 = queue.pop(); 
+console.log('🚀 ~ curr2:', curr2); //  1
+console.log('🚀 ~ queue:', queue); // [2, 3]
+
+const curr3 = queue.shift();  // 앞에서부터 빼기
+console.log('🚀 ~ curr3:', curr3); //  2
+console.log('🚀 ~ queue:', queue); // [3]
+```
+
+### indexOf(), lastIndexOf(), findIndex()
+
+```jsx
+const lst = ['글1', '글2', '글3', '글4'];
+
+lst.push('글4');
+console.log(lst.indexOf('글4'));  // 3 // indexOf는 처음 찾은 것의 인덱스
+console.log(lst.lastIndexOf('글4')); // 4 // lastIndexOf는 마지막 찾은 것의 인덱스
+
+const hong = { id: 1, name: '홍길동' };
+const kim = { id: 2, name: '김철수' };
+const park = { id: 3, name: '박영수' };
+
+const users = [hong, kim, park];
+const iduser = users.findIndex((v, i) => v.id === 2);
+console.log('🚀 ~ iduser:', iduser);
+
+const id2user = users.find((v) => v.id === 2);
+console.log('🚀 ~ id2user:', id2user);
+
+```
+
+### forEach()
+
+- forEach = for + of
+
+```jsx
+const hong = { id: 1, name: '홍길동' };
+const kim = { id: 2, name: '김철수' };
+const park = { id: 3, name: '박영수' };
+
+// 같은 코드
+for (const user of users) {
+  console.log(user.id, user.name);
+}
+
+users.forEach((v) => console.log(v.id, v.name));
+```
+
+### filter(), every(), some()
+
+```jsx
+const evenusers = users.filter((v) => v.id % 2 === 1); // filter는 끝까지 돌면서 찾음 // 배열로 반환
+console.log('🚀 ~ evenusers:', evenusers);
+
+const isEveryLess5 = users.every((v) => v.id < 5); // 모두 만족해야 true
+console.log('🚀 ~ isEveryLess5:', isEveryLess5);
+
+const isSomeLess5 = users.some((v) => v.id < 5); // 하나라도 만족하면 true
+console.log('🚀 ~ isSomeLess5:', isSomeLess5);
+
+const hasId3 = users.some((v) => v.id === 3);
+console.log('🚀 ~ hasId3:', hasId3);
+```
+
+### at()
+
+- at(n): n번째 있는 걸 줘
+
+```jsx
+const lst2 = [1, 2, 3, 4, 5];
+
+const last = lst2.at(-1);
+console.log('🚀 ~ last:', last);
+const beforeLast = lst2.at(-2);
+console.log('🚀 ~ beforeLast:', beforeLast);
+```
+
+### slice()
+
+- 배열 일부 가져오기
+- slice(시작 idx, 미만 idx)
+- 순수함수
+
+```jsx
+const lst2 = [1, 2, 3, 4, 5];
+
+console.log(lst2.slice(-2)); // [4, 5]
+console.log(lst2.slice(1, 3)); // [2, 3]
+console.log(lst2.slice(1, -2)); // [2, 3]
+```
+
+### splice()
+
+- 제거 + 추가
+- **splice(sIdx, cnt, ...appends)** // sIdx부터 cnt개 제거 후 appends추가
+- 비순수함수
+
+```jsx
+const lst2 = [1, 2, 3, 4, 5];
+
+console.log(lst2.splice(2, 3)); // [3, 4, 5] // 원본에서 잘라냄
+console.log('🚀 ~ lst2:', lst2); // [1, 2]
+console.log(lst2.splice(1, 2, 10, 20)); // [2] // 1번째부터 2개 지우고 10, 20 추가
+console.log('🚀 ~ lst2:', lst2); // [1, 10, 20]
+```
+
+### concat()
+
+- 합치기
+
+```jsx
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+
+const arr3 = arr1.concat(arr2);
+console.log('🚀 ~ arr3:', arr3); // [1, 2, 3, 4, 5, 6]
+
+const arr4 = [...arr1, ...arr2];
+console.log('🚀 ~ arr4:', arr4); // [1, 2, 3, 4, 5, 6]
+
+const arr5 = arr1.concat(4, 5, 6);
+console.log('🚀 ~ arr5:', arr5); // [1, 2, 3, 4, 5, 6]
+
+const arr6 = arr1.concat([4, 5, 6]);
+console.log('🚀 ~ arr6:', arr6); // [1, 2, 3, 4, 5, 6]
+
+const arr7 = arr1.concat([4, 5], 6);
+console.log('🚀 ~ arr7:', arr7); // [1, 2, 3, 4, 5, 6]
+```
+
+### reverse(), toReversed()
+
+- 정렬은 안하고 뒤집기만 함
+
+```jsx
+arr = [3, 5, 2, 7, 1];
+console.log(arr.toReversed()); // [1, 7, 2, 5, 3] // 원본 안바뀜
+console.log('🚀 ~ arr:', arr); // [3, 5, 2, 7, 1]
+
+arr.reverse(); // [1, 7, 2, 5, 3]  -> 원본 바뀜
+console.log('🚀 ~ arr:', arr); // [1, 7, 2, 5, 3]
+```
+
+### assert()
+
+- primitive(원시값) 비교: strictEqual
+- object(reference) 비교: deepStrictEqual
+
+```jsx
+var assert = require('assert');
 ```
