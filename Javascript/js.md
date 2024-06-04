@@ -1420,3 +1420,411 @@ console.log('🚀 ~ arr:', arr); // [1, 7, 2, 5, 3]
 ```jsx
 var assert = require('assert');
 ```
+
+### 유사 배열 객체(Array-like Object)
+
+- string, object, arguments, DOM NodeList, jQuery 객체 등
+- iterable
+- length 프로퍼티를 가짐
+- for-of를 제외하고 array 메소드 사용 불가 (string은 forEach 안됨)
+- Array.from(유사배열객체)로 array로 만들 수 있음
+
+### reduce()
+
+- Array.reduce(cb(현재까지 누산된 값, item) ⇒ 누산로직, 초기값)
+
+```jsx
+const sum = arr.reduce( (s, a) => s += a, 0 );
+const sum = arr.reduce( (s, a) => s += a );
+const sum = arr.reduce( (s, a) => s + a );
+```
+
+## 객체 지향 프로그래밍
+
+- primitive(원시) 타입을 제외한 모든 것이 객체(object)
+- 배열: 순서가 있는 숫자형(문자열) 인덱스 리스트
+- 객체: 문자열/심볼 인덱스(키) 프로퍼티
+- object type(except null)과 Class를 통해 생성된 instance type(this)
+- JS: prototype 기반 객체 지향 프로그래밍 언어(OOP)
+(But, class is constructor function! Function is Object!)
+- 객체는 데이터(member variable)와 기능(method)의 논리적 묶음
+property는 instance별 EnvRec에 생성되고, method는 prototype에 할당되어 모든 instance가 동일 <f.o> 참조
+- 특정 인스턴스에 묶이지(종속되지) 않는 함수를 클래스(정적) 메소드라 한다.
+
+| 특성 | 설명 |
+| --- | --- |
+| 은닉성 | 캡슐화, 내부(local) 변수 및 메소드 보호 (private, protected, public) |
+| 상속성 | 확장성 (extends, mixin, prototype), superclass & subclass |
+| 다형성 | polymorphism, interface/ super class |
+| 추상화 | abstract class |
+
+### 객체와 인스턴스
+
+```jsx
+const obj = {id: 1, name: 'Hong'};
+// cf. obj = {..., __proto__: { x: 11 }};
+
+console.log(obj.toString);
+Object.getPrototypeOf(obj) === Object.prototype
+
+class Animal {
+    // instance(this) + prototpye 생성! (무엇보다 먼저 실행!) 
+    constructor(name) {
+    this.name = name || super.constructor.name;
+  }
+}
+const dog = new Animal('Dog');
+console.log('ok=', Object.keys(obj));
+console.log('ak=', Object.keys(dog));
+
+for (let k in dog) console.log('k=', k);
+
+console.log('oh=', obj.hasOwnProperty('id'));
+console.log('dh=', dog.hasOwnProperty('id'));
+```
+
+```jsx
+obj instanceof Object // ? 
+Object instanceof Function // ?
+Animal instanceof Object
+dog instanceof Animal
+typeof (dog, obj, [])
+typeof Animal
+
+dog instanceof Array
+[] instanceof Array
+{} instanceof Object
+[] instanceof Object
+Object.getPrototypeOf([]) === Object.prototype
+
+dog.constructor === Animal // ?
+
+Object.values(dog);
+Object.entries(dog);
+```
+
+### 프로토타입 - 단방향 LinkedList
+
+```jsx
+
+```
+
+![js_5](js/5.png)
+
+### 정적 필드/ 메소드 -  Class(static) field/ method
+
+- 특정 인스턴스와 무관하고 class에 존재하는 함수(method)
+⇒ 인스턴스 프로퍼티를 참조할 수 없다. static 영역에 생성(not prototype)
+
+### Method Overriding & Private Member Variables
+
+- overriding: 부모(super)의 함수(method)를 재정의
+
+```jsx
+console.log(dog.toString()); // [Object object]
+
+class Animal {
+  ...
+    id = 1; // member property
+    #age = 10; // private member variable
+    
+    getAge() { // Override the Object's toString() 
+        return this.#age;
+    }
+    
+    toString() { // Override the Object's toString(), [메소드] 다형성! 
+        return `This animal's name is ${this.name}.`;
+    } 
+}
+
+const dog = new Animal('Dog'); 
+console.log('id=', dog.id); // ? 
+console.log('age=', dog.age); // ? 
+console.log('age=', dog.getAge()); // ?
+
+console.log(dog.toString()); // ?
+```
+
+### 상속 (extends) - SuperClass & SubClass
+
+- prototype chain을 통한 모든 데이터와 기능을 상속 - object is root class
+- Class - Interface - Abstract Class
+- 상속: 부모의 구현체(DNA)를 부여 받는다
+- 구현: 인터페이스에 정의된 함수를 구현한다. 부모(인터페이스)에는 구현이 없다.
+- 추상 클래스: 부모가 일부는 구현, 일부는 정의 → 정의부분만 새롭게 구현
+- 다중 상속 - interface(TS), mixin/trait(JS): 여러 클래스를 상속받고 싶다.
+
+## 이터레이터와 제너레이터
+
+### 이터레이터 (iterator)
+
+- 포인터 역할, 현재 어디에 있고 다음에 어디로 가는지
+- value, done, next() 이용해 ‘더 쓸모있는 동작이 가능’한 객체를 만듦
+
+**iterable**
+
+- [Symbol.iterator]() 구현 → 실행하면 iterator literal 반환
+- Array, Map, Set, string, arguments, NodeList 등
+
+### 제너레이터 (generator)
+
+- function***** 제너레이터 함수)의 실행을 제어하는 함수
+- 제너레이터를 호출하면 이터레이터를 얻는다. (실행이 한번에 끝나지 않는다.)
+→ 즉 next() 호출 가능
+- 실행 시, yield를 만나면 제너레이터는 호출자(caller)에게 정보 반환과 제어권을 넘김 (즉, iterator의 next()와 done이 불필요하고 yield한 만큼만 iterate됨)
+
+```jsx
+function* route() {
+const start = yield "출발 역은?"; // yield가 있으므로 caller에게 제어권 넘김. yield뒤는 그냥 메시지! const end = yield "도착 역은?";
+return `${start}역에서 출발하여 ${end}역에 도착합니다.`;
+}
+const caller = route(); // next() 함수가 있는것으로 볼 때, "내 안에 이터레이터 있다!"
+caller.next(); // undefined보내면 제너레이터는 {value: '출발 역은?', done: false}를 caller에게 보내(반환하)고 일시 정지.
+caller.next('문래'); // start에 '문래'를 주입하고, {value: '도착 역은?', done: false}를 caller에게 보내고 일시 정지.
+caller.next('신림'); // end에 신림 주입하고, {value: '문래역에서 출발하여 신림역에 도착합니다.', done: true} 반환과 동시에
+```
+
+- `function* ~ yield` - iterator를 return하고, 일시정지 하나 상태로 시작
+
+```jsx
+function* gener() {
+const x = yield 1;
+const y = yield (x + 10); console.log('x y =', x, y); return x + y;
+}
+const it3 = gener();
+console.log(it3.next()); // { value: 1, done: false } console.log(it3.next(3)); // { value: 13, done: false }
+console.log(it3.next(5));
+// x y = 3 5
+// { value: 8, done: true }
+```
+
+## 맵과 셋
+
+### map
+
+- new Map(), new Map([[k1, v1], [k2, v2]]) - 키: 값, 키는 객체도 가능
+- 단순한 객체는 프로퍼티 순서 보장 안됨, spread 불가 → map 필요
+- 
+
+### set
+
+- new Set(), new Set([v1, v2, v3, …])
+- 중복을 허용하지 않는 데이터 집합
+- has(k), add(k, v), delete(k), keys(), values(), entries(), size
+- Set의 value가 reference type일 경우 GC 대상이 안됨 (Set 자체가 참조)
+
+### WeakSet(위크셋)
+
+- new WeakSet(), new WeakSet([hong, kim, …]) - 값(객체만 가능)
+- value는 object만 가능
+- value는 GC 대상 (주소만 갖지 참조는 없음)
+- 이터레이터 안됨
+- size 프로퍼티와 clear 메소드가 없음
+- only (add, has, delete) methods
+- 주 용도: 해당 객체가 존재하는지 판단
+
+```jsx
+// set과 weakset
+const ws = new WeakSet();
+const s = new Set();
+
+{
+    let obj1 = { id: 1 }; 
+    const obj2 = { id: 2 }; 
+    ws.add(obj1); 
+    s.add(obj1);
+    
+  ws.add(obj2);
+  s.add(obj2);
+  
+    obj1 = null; // obj1 주소 변경 
+    console.log(ws, ws.has(obj1));
+    console.log(s, s.has(obj1));
+}
+
+console.log(s.size, ws.size);
+console.log('ws>', ws);
+console.log('s>>', s);
+```
+
+## Number, Math, Date
+
+### Number
+
+- new Number(n), Number(n)
+- Number.NaN : Not a Number (Number 생략 가능)
+- Number.EPSILON : 부동 소수점 문제 해결
+
+### Math
+
+- 수학 관련 상수와 함수 제공
+- Math.random(): 0이상 ~ 1미만 실수 난수
+- Math.floor((Math.random()*10) + 1) : 1 ~ 10 사이 난수
+- Bigint: from ES2020, V8 Engine(10억 비트까지 표현)
+
+### Date
+
+- new Date(), Date()
+- 0 === 1970년 1월 1일 0시 0분 0초(UTC)
+- typeof Date() === ‘string’
+
+**moment.js**
+
+**debounce**
+
+- delay 기간 중 재 호출 시 기존 호출 무시!즉, 마지막(최종) 호출이 delay초(ms) 후에 실행!
+
+```jsx
+const debounce = (cb, delay) => {
+let timer;
+  return (...args) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(cb, delay, ...args);
+}
+}
+const act = debounce(a => a + 1, 1000); act(100);
+// 1초 동안 n번 호출 => 실행은 1회만!
+// 1초 후 => cb(100) 실행
+// 1.5초 후 act(100);
+
+```
+
+**throttle**
+
+- delay 기간 별 1회 호출 보장!
+
+```jsx
+const throttle = (cb, delay) => {
+  let timer;
+  return(...args) => {if (timer) return;timer = setTimeout(() => {cb(...args);timer = null;}, delay);
+} }
+const act = throttle(a => a + 1, 1000); act(100);
+// 1초 동안 n번 호출 => 실행은 1회만!
+// 10초 동안 n번 호출 => 실행은 10회만!
+// 매 1초 마다 => cb(100) 실행
+```
+
+## 문자열과 정규 표현식
+
+### 문자열
+
+charCodeAt(idx)
+
+![js_6](js/6.png)
+
+### 정규표현식
+
+- 문자열의 패턴을 기술하는 방법으로 찾기, 추출, 바꾸기 등을 할 수 있다
+- 정규식: /pattern/flag
+- common character
+    
+    
+    | 표현 | 설명 |
+    | --- | --- |
+    | \d | 숫자[0-9] |
+    | \D | not 숫자 [^0-9] |
+    | \w | 영숫자[0-9A-z_] |
+    | \W | not 영숫자[^0-9A-z_] |
+    | \s | 공백/탭/줄바꿈 |
+    | \S | not 공백/탭/줄바꿈 |
+    | \x | 16진수 ASCII |
+    | \u | 16진수 unicode |
+    | . | 개행문제 외 모든 문자 |
+- operator
+    
+    
+    | 표현 | 설명 |
+    | --- | --- |
+    | {n, m} | n개부터 m개 |
+    | * | 0개 이상 |
+    | + | 1개 이상 |
+    | ? | 0개 또는 1개 {0, 1} |
+    | ^ | 시작 |
+    | $ | 끝 |
+    | () | 묶음 |
+    | [] | 범위묶음 |
+    | [^x] | x제외/not |
+    | | | OR |
+    
+    ![js_7](js/7.png)
+    
+- flags
+    
+    
+    | 표현 | 설명 |
+    | --- | --- |
+    | i | ignore |
+    | g | global, 있는거 다 찾기, 문자열로 반환 |
+    | m | multi-line |
+    | y | lastIndex |
+    | u | unicode 전체 지원 |
+    | s | common-character(.에 개행도 포함) |
+    | test | 전화번호, URL, 이메일, 고유번호 validation 체크 |
+- match: 문자열 검색
+- test: 전화번호, URL, 이메일, 고유번호 validation 체크
+
+```jsx
+// 전화번호
+/^\d{2,3}-\d{3,4}-\d{4}$/.test('02-2345-2323')  // true
+/^\d{3}-\d{3,4}-\d{4}$/.test('010-2345-2323')  // true
+/^\d{2,4}-\d{3,4}-\d{4}$/.test('1577-2323')  // false
+/^\d{2,4}-\d{3,4}(-\d{4})?$/.test('1577-2323')  // all true
+
+// url
+/^http(s?):\/\/.*\..*$/.test('http://thopician.com')  // true
+/^http(s?):\/\/.*\..*$/.test('http://thopician')  // false
+
+// email
+const regex = /^[A-z0-9][\w-\.]*@[\w-]+\..*([A-z]{2, 7})$/;  //2f_d.f@a.company
+regex.test('js123@topician.com');  // true
+regex.test('jade123@topician');  // false
+regex.test('ja_de.j-u-n@topician.store');  // true 
+regex.test('jade@jeon@topician.store');  // false
+```
+
+- replace, replaceAll
+
+## 모듈(module)
+
+- 함수들의 집합 (package: 모듈 한개 이상을 모아둠)
+- directory 마다 새로 설치!
+- package.json: 어떤 패키지가 설치돼있지 알 수 있다
+- package-rock.json: 노드 패키지가 어떻게 설치되있는지 상세 정보가 들어가있다. 내가 올린 것과 같은 버전을 동료가 pull 받을 수 있다. (npm i 만 입력하면 없는 것들 다 맞춰서 다운 받아줌)
+- 과거에는 CommonJS 방식을 썼었음 → 요즘: ESM
+- NodeJS에서 ESM 사용 방법
+    - package.json에 `"type": "module",` 추가!
+
+```jsx
+var moment = require('moment');  // CommonJS 방식
+import moment from 'moment';  // ESM 방식
+
+moment.locale('ko');  // 한국어
+```
+
+```jsx
+const d = new Date();
+console.log('🚀 ~ d:', d.toLocaleString());
+const m = moment();
+console.log('🚀 ~ m:', m.fromNow());
+console.log('🚀 ~ m:', m.format('LLL'));
+console.log('🚀 ~ m:', m.format('dddd'));
+console.log('🚀 ~ m:', m.format('YYYY-MM-DD (ddd) hh:mm:ss'));
+
+const writtenDate = moment('2024-05-30');
+console.log('🚀 ~ writtenDate:', writtenDate.fromNow());
+```
+
+### import & export
+
+- 다른파일에 있는 함수를 가져와서 쓰고 싶다
+    1. export
+    export default를 붙이면 import 할 때 {} 생략 가능 - 1개만 가능
+    2. import
+        
+        ```jsx
+        export class Dog extends Animal {}
+        export default Cat; // 이렇게 따로 선언해도 됨
+        
+        import Cat, { Dog } from './oop.js';
+        const nabi = new Cat('nabi');
+        ```
