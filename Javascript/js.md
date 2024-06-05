@@ -59,6 +59,8 @@ function f(){
 - mutable: 메모리 사이즈가 안바뀌는 곳에서  ex. 배열; 주소값을 가진 메모리
 - immutable: 변수의 값을 담고 있는 곳
 
+---
+
 ## 변수 타입
 
 **원시형 / 참조형 중요**
@@ -710,6 +712,7 @@ call stack의 포인터: stack pointer(SP), instruction pointer(IP)
 
   ![js_3](js/3.png)
     
+---
 
 ## 스트릭트 모드
 
@@ -758,6 +761,8 @@ f(200);
 // block f= 100
 // global f= 200
 ```
+
+---
 
 ## 클로저와 실행컨텍스트 심화
 
@@ -891,6 +896,8 @@ console.log('Current User Count=', counter.count); // counter.getCount()
 
 ![js_4](js/4.png)
 
+---
+
 ## Object & Property
 
 - Object.create: prototype에 만들어짐
@@ -910,6 +917,8 @@ Object.freeze(user);  // 추가 삭제, 쓰기, 재정의 x, 읽기 o
 - key-value 형태
 - prototype의 property, ~~method의 property~~(?) 이런식으로 쓰임
 - method는 prototype에 있음
+
+---
 
 ## 함수
 
@@ -1185,6 +1194,8 @@ f(mode){
 
 ```
 
+---
+
 ## 배열
 
 ### 배열
@@ -1439,6 +1450,8 @@ const sum = arr.reduce( (s, a) => s += a );
 const sum = arr.reduce( (s, a) => s + a );
 ```
 
+---
+
 ## 객체 지향 프로그래밍
 
 - primitive(원시) 타입을 제외한 모든 것이 객체(object)
@@ -1554,6 +1567,8 @@ console.log(dog.toString()); // ?
 - 추상 클래스: 부모가 일부는 구현, 일부는 정의 → 정의부분만 새롭게 구현
 - 다중 상속 - interface(TS), mixin/trait(JS): 여러 클래스를 상속받고 싶다.
 
+---
+
 ## 이터레이터와 제너레이터
 
 ### 이터레이터 (iterator)
@@ -1597,6 +1612,8 @@ console.log(it3.next(5));
 // x y = 3 5
 // { value: 8, done: true }
 ```
+
+---
 
 ## 맵과 셋
 
@@ -1646,6 +1663,8 @@ console.log(s.size, ws.size);
 console.log('ws>', ws);
 console.log('s>>', s);
 ```
+
+---
 
 ## Number, Math, Date
 
@@ -1703,6 +1722,8 @@ const act = throttle(a => a + 1, 1000); act(100);
 // 10초 동안 n번 호출 => 실행은 10회만!
 // 매 1초 마다 => cb(100) 실행
 ```
+
+---
 
 ## 문자열과 정규 표현식
 
@@ -1784,6 +1805,8 @@ regex.test('jade@jeon@topician.store');  // false
 
 - replace, replaceAll
 
+---
+
 ## 모듈(module)
 
 - 함수들의 집합 (package: 모듈 한개 이상을 모아둠)
@@ -1828,3 +1851,134 @@ console.log('🚀 ~ writtenDate:', writtenDate.fromNow());
         import Cat, { Dog } from './oop.js';
         const nabi = new Cat('nabi');
         ```
+
+---
+
+## npm 모듈
+
+- npm trends, clsx: 최신 트랜드 알 수 있음
+
+### npm 모듈 만들기
+
+```bash
+npm info <pkg>  # 같은 이름의 패키지가 있는지 확인
+npm init  # package.json 생성, name 중복되지 않는걸로 설정
+npm login  # 계정 연동
+npm publish --access public  # 배포
+npm i <pkg>  # install
+```
+
+### 번들링
+
+- tree-shaking: 죽은 코드 제거(불필요한 거 다 빼는거)
+- babel: js 버전 동일하게 변환
+- webpack: 모듈로 된 소스코드들을 하나로 묵어줌(패키징)
+- rollup: webpackr과 같은 기능, 속도 빠름
+- turbopakc: 50배 빠름
+
+---
+
+## 비동기 프로그래밍 (Asynchronous)
+
+비동기: web API, background API
+
+await: async에 대해 waiting 하는거 
+
+![js_8](js/8.png)
+
+![js_9](js/9.png)
+
+- Promise: 약속, 부탁
+    - 성공 → then, 실패 → catch, 마지막 처리 → finally
+    - web API에 쓸 수 있음
+    
+    ```jsx
+    const URL = 'https://jsonplaceholder.typicode.com'; // 전역상수 대문자
+    const getUserName = async (userId) => {
+      const res = await fetch(`${URL}/users/${userId}`);
+      // console.log('🚀 ~ getUserName ~ res:', res);
+      await new Promise((resolve, reject) => {
+        setTimeout(() => resolve('OK'), 2000);
+      });
+    
+      const data = await res.json();
+      // console.log('🚀 ~ getUserName ~ data:', data);
+    
+      return data?.name;
+    };
+    
+    console.log('1번 유저명', await getUserName(1));
+    ```
+    
+
+- async는 promise를 방환
+- await은 resolve, reject와 매핑
+- array의 메소드(map, set 등)에서는 async 사용 안됨
+
+### **Promise 실수**
+
+1. 불필요한 Promise 객체 반환: 함수가 비동기인지 알고 코딩하자
+2. Promise 결과 반환
+3. Promise 오류처리
+4. 아무것도 하지 않는 핸들러: promise에서 던진 error는 외부에서 못잡음 → throw-catch같이 있어야함
+    
+    ```jsx
+    try {
+        await randTime(1);  // randTime 함수에서 throw
+    } catch(arr) {  // try 안에서 나오는 error는 다 잡아줄게
+    } finally {}
+    ```
+    
+5. 잘못된 연결
+6. 잘못된 await ⭐
+    1. return 할때 await 필요 없음, 2번 기다리는거 NO!
+
+### for-await-of
+
+- [Symbol.asyncIterator]()
+- of 뒤에 객체가 promise들의 iterator일때 (async iterator일때)
+
+```jsx
+for await (const fao of arr.values()) {
+    console.log('fao=', fao);
+}
+```
+
+---
+
+## DOM (Document Object Model)
+
+- modeling: 규격화한다. (ex. html 기본 구성)
+
+### Internet
+
+- 1950년대 - 컴퓨터 개발
+- 1969년 - ARPAnet(인터넷 하려면 선 깔아야함)
+- www 개발
+
+### HTTP
+
+- 웹소켓: 앱이 열려있어도 행동이 없으면 1분에 한번,1시간에 한번씩 로딩
+- http1: 주세요1 → 받아옴 , 주세요2 → 받아옴 …
+- http2: 주세요, 주세요, 주세요 → 온 순서대로 메모리 상에 배치 → 화면에 paint는 한번에 - 멀티스레드
+
+![js_10](js/10.png)
+
+- param: path 중에 계속 바뀌는거
+
+### HTML
+
+- HTML extends XHTML extends XML
+- Nodes
+    - element: <div></div>
+    - text: 글만 있는 것
+    - comment: <!— ~~ —>
+
+### Browser Rendering
+
+1. Connnet & Request to Server
+2. HTML/CSS parsing ⇒ Token/Lexer ⇒ Node ⇒ DOM, CSSOM ⇒ Render(DOM/CSSOM) Tree
+3. JS Parsing ⇒ AST(ByteCode)
+4. Layout (Reflow ← 브라우저 크기 변경): Rander Tree에 크기(w/h, scrollXY), 좌표(위치) 등 결정
+5. Paint (RePaint ← Reflow): 텍스트, 색상, 굵기, 모서리(radius), 그림자 등
+6. composite: layer 합성
