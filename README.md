@@ -51,9 +51,13 @@
 - CSS
 - Bootstrap
 
-## [Javascript](https://github.com/Belluable/TIL/blob/master/Javascript/js.md)
+## [JavaScript](https://github.com/Belluable/TIL/blob/master/Javascript/js.md)
 - 변수 vs 상수
 - 연산자
+
+## [TypeScript](https://github.com/Belluable/TIL/blob/master/Typescript/ts.md)
+- Typescript Compiler
+- 타입의 종류
 
 ## Algorithm
 - [백준](https://github.com/Belluable/TIL/tree/master/Algorithm/BOJ)
