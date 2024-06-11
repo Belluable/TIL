@@ -23,6 +23,7 @@
 5. Type Check
     1. inference
     2. assignability
+    3. structurally typed (Symbol Table)
 6. Transform
 7. Emit
 
@@ -91,3 +92,108 @@ firstName.length();
 
 - 진화하는 any
 - 초기값을 할당하지 않고도 변수의 타입을 선언할 수 있는 구문
+
+## 유니언과 리터럴
+
+### 타입 별칭(Type Alias)
+
+```tsx
+type User = { id: number; name: string; addr?: string };
+const user: User = { id: 1, name: 'Alice' };
+user.addr = 'Seoul';
+
+type Emp = { id: number; name: string; dept: string | number };
+const emp: Emp = {
+  id: 1,
+  name: 'Kim',
+  dept: 'Sales',
+};
+emp.dept = 12;
+```
+
+### 리터럴 타입
+
+- 원시 타입보다 더 구체적인 원시 타입, 원시값 자체가 타입이 됨
+- 서로 다른 리터럴 타입은 서로 할당 X
+
+```tsx
+const Y = 'y'; // y타입
+let Z: 'x' | 'y' | 'z' = 'x'; // literal 타입
+Z = 'y';
+Z = Y;
+let N: 1 | 2 | 3 = 3;
+```
+
+### 유니언 타입
+
+- 값에 허용되는 타입을 2개 이상의 가능한 타입으로 확장하는 것
+- A or B ??? 둘 이상의 타입 중 하나가 아니다 (개 중 하나)
+- 둘 이상의 타입으로 확장된 타입에서 일부 속성들의 조합이 어느 하나의 타입에 할당 가능하면 OK
+    
+    ![ts_1](ts/1.png)
+    
+- 유니언으로 선언한 모든 타입에 존재하는 공통되는 속성에만 접근 가능
+    
+    ![ts_2](ts/2.png)
+    
+
+- 유니언 타입에서 특정 타입에만 존재하는 속성에 접근하고 싶다면?
+    
+    → type guard를 통해 type narrowing
+    
+- narrowing: 값이 더 구체적인 타입임을 코드에서 유추하는 것
+- type guard: narrowing을 하기 위한 논리적인 검사
+    1. 값 할당을 통한 내로잉 (x = 1)
+    2. typeof 검사를 통한 내로잉
+    3. 조건 검사를 통한 내로잉(if x === ‘stringValue’)
+    4. in (cf. hasOwnProperty 는 X)
+    5. instanceof
+    6. Array.isArray (불규칙 허용)
+- typeof narrowing 주의: 검사되는 property만 narrowing (who.spend의 타입이 number[] 타입이라고해서 who의 타입이 Member로 narrowing된 것이 아님!)
+
+### strictNullChecks
+
+- null 혹은 undefined 값을 참조/할당 했을 때 타입 에러 발생 여부
+    
+    ⇒ 10억 달러의 실수 (NullPointerException) ⇒ `‘strict’: true`
+    
+- 활성화: null 및 undefined에 대한 오류로 부터 안전 →  항상 `‘strict’: true`로 해놓자
+- 비활성화: `‘strict’: false` → null/undefined를 찾을 수 없음!!
+    
+    ⇒ JS와 같아짐 = TS 쓰는 이유 없어짐
+    
+    ```tsx
+    let a: string | undefined;
+    console.log(a?.length);
+    console.log(a.length); // error
+    ```
+    
+
+## 객체 타입
+
+- freshness: 아직 가공이 안된 상태, 쓸 수 없음 (ex. 흙 당근)
+    - freshness 끄는 방법:
+    1) 변수할당 
+    2) type casting (type assertion) 
+    3) union으로 체크에서 제외
+    4) 함수 통하기 (return)
+- Type check system
+- CoVariance & ContraVariance
+    - 함수의 스펙트럼이 더 큰 놈을 줘야 할당 가능
+    - CoVariance: 원래 지정된 것보다 더 많이 파생된 형식을 사용할 수 있다.
+    - ContraVariance : 원래 지정된 것보다 더 제네릭한(덜 파생적인) 형식을 사용할 수 있다.
+    - TS는 CoVariance
+    
+    ```tsx
+    
+    type Xuser = {id: number; name: string};
+    type Xemp = {id: number; name: string; addr: string};
+    let xuser: Xuser;
+    let xemp : Xemp;
+    
+    xuser = {id:1, name: 'hong'};
+    xemp = {id:1, name: 'lee', addr: 'Pusan'};
+    
+    xuser = xemp; // CoVariance:(id, name) <= (id, name, addr)
+    xemp = xuser; // Error! ContraVariance: (id, name, addr) <= (id, name)
+    ```
