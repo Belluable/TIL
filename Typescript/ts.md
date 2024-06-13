@@ -413,7 +413,7 @@ function 함수명(this: 타입) {
 ### noUncheckrdIndexedAccess
 
 - 해당 index의 값이 undefined일 수 있음을 체크
-- 이 옵션을 true로 설정하면 인덱스 시그니처에 undefined를 포함
+- 이 옵션을 `true`로 설정하면 인덱스 시그니처에 undefined를 포함
 - 인덱스 시그니처?
     - 받을게 너무 많을 때 줄여서 쓸 수 있음
     - 웬만하면 다 적어주는게 좋음
@@ -461,7 +461,7 @@ function 함수명(this: 타입) {
 ### 스프레드
 
 - 두 배열을 결합하면 어떤 타입이 될가?
-    - concat은 결합하려는 두 배열의 타입이 같아야한다.
+    - `concat`은 결합하려는 두 배열의 타입이 같아야한다.
     - 서로 다른 타입의 두 배열을 결합하려면 → spread!
     
     ```tsx
@@ -567,64 +567,75 @@ uuidv4(); // ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
 ## 인터페이스 (`interface`)
 
 - `interface` 같은 이름이 허용됨 vs `type` 은 같은 이름 안됨!!
-- 속성 타입
-    - 선택적 속성 (optional property)
-    - 읽기 전용 속성 (readonly property)
-- 함수와 메서드
-    - 메서드 구문 (method syntax)
-    - 속성 구문 (property syntax)
-- 호출 시그니처
-    - 함수를 호출하는 방법에 대한 타입 시스템 설명
-    - 매개변수 목록(with type)과 반환 타입을 포함
-    - `(name: string, age: number, addr: string[]) => boolean`
-- 인덱스 시그니처
-    - 임의의 key를 받고, 해당 key에 대한 value의 타입을 지정함
-    - `[key: string]: number`
-    - 주의!! 인덱스 시그니처를 사용하면 프로퍼티의 존재 유무를 알 수 없다! `noUncheckedIndexedAccess`
-    - 속성과 인덱스 시그니처 혼합
-        
-        ```tsx
-        interface Novel {
-          title: string; // 필수 속성 (실제 사용할 속성)
-          [key: string]: string | number | boolean;
-        }
-        
-        const novel: Novel = {
-          title: 'novel',
-          page: 130,
-        };
-        ```
-        
-    - 숫자 인덱스 시그니처
-- 중첩 인터페이스 (nested interface)
-    - 속성의 타입이 다른 인터페이스(or 자체 인터페이스)나 객체 타입을 가질 수 있다.
-- interface 확장 (extends) vs type 확장 (&)
+
+### 속성 타입
+
+- 선택적 속성 (optional property)
+- 읽기 전용 속성 (readonly property)
+
+### 함수와 메서드
+
+- 메서드 구문 (method syntax)
+- 속성 구문 (property syntax)
+
+### 호출 시그니처
+
+- 함수를 호출하는 방법에 대한 타입 시스템 설명
+- 매개변수 목록(with type)과 반환 타입을 포함
+- `(name: string, age: number, addr: string[]) => boolean`
+
+### 인덱스 시그니처
+
+- 임의의 key를 받고, 해당 key에 대한 value의 타입을 지정함
+- `[key: string]: number`
+- 주의!! 인덱스 시그니처를 사용하면 프로퍼티의 존재 유무를 알 수 없다! `noUncheckedIndexedAccess`
+- 속성과 인덱스 시그니처 혼합
     
     ```tsx
-    // interface 확장
-    interface A {
-        id: number;
+    interface Novel {
+      title: string; // 필수 속성 (실제 사용할 속성)
+      [key: string]: string | number | boolean;
     }
     
-    // B has id + name
-    interface B extends A {  // A type alias라도 가능!
-        name: string;
-    }
-    
-    // Type alias로 extends 하기 
-    type A = {
-        id: number;
-    }
-    
-    type B = { 
-        name: string;
-    } & A;
-    
-    let hong: B = {
-        id: 1, name: 'Hong'
+    const novel: Novel = {
+      title: 'novel',
+      page: 130,
     };
     ```
     
+- 숫자 인덱스 시그니처
+
+### 중첩 인터페이스 (nested interface)
+
+- 속성의 타입이 다른 인터페이스(or 자체 인터페이스)나 객체 타입을 가질 수 있다.
+
+### nterface 확장 (extends) vs type 확장 (&)
+
+```tsx
+// interface 확장
+interface A {
+    id: number;
+}
+
+// B has id + name
+interface B extends A {  // A type alias라도 가능!
+    name: string;
+}
+
+// Type alias로 extends 하기 
+type A = {
+    id: number;
+}
+
+type B = { 
+    name: string;
+} & A;
+
+let hong: B = {
+    id: 1, name: 'Hong'
+};
+```
+
 - interface 타입 재정의 (type override)
     - 부모 타입 > 자식 타입 ⇒ 통과!
 - interface 병합 활용
@@ -671,10 +682,11 @@ interface Dept {
 
 interface Ud2 {
   // <이 부분을 작성하시오>
+  [k:string]:string|number;
   id: number;
-  name?: string;
-  dname?: string;
-  captain?: string;
+//  name?: string;
+//  dname?: string;
+//  captain?: string;
   addr: string;
 }
 
@@ -682,3 +694,193 @@ interface Ud2 {
 const ud2: Ud2 = { id: 1, name: 'HH', addr: 'Seoul' };
 const ud3: Ud2 = { id: 1, dname: 'HH', captain: 'HH', addr: 'Seoul' };
 ```
+
+---
+
+## 클래스
+
+```tsx
+interface Animal {
+  move(): void;
+  // move: () => void;
+}
+
+class Pet implements Animal {
+  name~~: string~~;  // 아래 있기 때문에 중복선언X
+  constructor(name: string) {
+    this.name = name;
+  }
+  move(): void {
+    console.log('Pet is moving');
+  }
+  bark() {}
+}
+
+class Dog extends Pet {
+  move() {
+    console.log('어슬렁');
+  }
+  bark() {
+    console.log('멍멍!', this.name);
+  }
+  howling() {
+    console.log('우우우우!', this.name);
+  }
+}
+
+class Cat extends Pet {
+  bark() {
+    console.log('야옹!', this.name);
+  }
+  kukuki() {
+    console.log('꾹!꾹!');
+  }
+}
+
+const lucy = new Dog('Lucy');
+lucy.move();
+lucy.bark();
+lucy.howling();
+
+const happy = new Cat('Happy');
+happy.bark();
+happy.kukuki();
+
+```
+
+### 클래스 속성
+
+- UML에서 #은 protected, JS에서 #은 private (헷갈리지 X)
+
+```tsx
+class Pet implements Animal {
+  protected name;  // #name
+  constructor(name: string) {
+    this.name = name;
+  }
+  move(): void {
+    console.log('Pet is moving');
+  }
+  bark() {}
+  getName() {  // name을 아래서 쓰기 위해 get 만들어주기
+    return this.name;
+  }
+}
+
+const maxx = new Dog('Maxx');
+console.log('🚀 ~ maxx:', maxx.getName()); 
+// name이 protected로 선언돼서 maxx.name으로 가져올 수 없음 -> getName으로 가져오기
+```
+
+- constructor로 초기화하지 않으면 변수에 직접 값을 할당해서 초기화 해줘야함
+
+```tsx
+class Pet implements Animal {
+  protected name;
+  protected age: number = 0;  // age 초기화
+  constructor(name: string) {
+    this.name = name;
+  }
+  setAge(xage: number) {  // constructor로 선언하지 않음
+    this.age = xage;
+  }
+  move(): void {
+    console.log('Pet is moving');
+  }
+  bark() {}
+  getName() {
+    return this.name;
+  }
+}
+```
+
+- 초기화 검사
+- 확실하게 할당된 속성 (non-null assertion): `!`
+
+```tsx
+class Pet implements Animal {
+  protected name;
+  protected age!: number; // !: undefined가 아니라고 선언
+  constructor(name: string) {
+    this.name = name;
+  }
+  setAge(xage: number) {
+    this.age = xage;
+  }
+  getAge() {
+    return this.age;
+  }
+  move(): void {
+    console.log('Pet is moving');
+  }
+  bark() {}
+  getName() {
+    return this.name;
+  }
+}
+```
+
+- 선택적 속성: `?`
+
+```tsx
+class Pet implements Animal {
+  protected name;
+  protected age?: number;
+  constructor(name: string) {
+    this.name = name;
+  }
+  setAge(xage: number) {
+    this.age = xage;
+  }
+  getAge() {
+    return this.age ?? 0;  // null이나 undefined면 0으로 계산해줘
+  }
+  move(): void {
+    console.log('Pet is moving');
+  }
+  bark() {}
+  getName() {
+    return this.name;
+  }
+}
+```
+
+- 읽기 전용 속성 (readonly)
+    - `: string` 은 string type, readonly: literal type
+
+```tsx
+class RandomQuote {
+	readonly explicit: string = 'Hello, Typescript';  // string type
+	readonly implicit = 'Hello, Typescript'; // Literal Type!
+	
+	// 처음에는 모두 문자열 리터럴로 선언되므로 string 타입으로 확장하기 위해서는 타입 애너테이션이 필요.
+	constructor() {
+		if(Math.random() > 0.5) {
+		this.explicit = 'Hi'; // OK
+		this.implicit = 'Hi';// Error : Type '"Hi"' is not assignable to type '"Hello, Typescript"'.}}
+}
+```
+
+### 타입으로서의 클래스
+
+- TS는 구조적으로 타입을 체크함, 선언되는 방식이 아니라 객체의 형태만 고려하기 때문
+- type, interface, class 모두 type alias로 들어갈 수 있음(`:` 뒤에 적히는 거)
+
+- ps) 다중상속 - mixin/trait(JS)
+    
+    (교재 p.196)
+    
+    - `Object.assign(a, b);` a에 b를 할당, 없는 것도 채워줌
+
+### 클래스와 인터페이스
+
+클래스 이름 뒤에 implements 키워드와 인터페이스 이름을 추가함으로써 클래스의 인스턴스가 해당 인터페이스를 준수한다고 선언할 수 있음
+
+- 다중 인터페이스 구현
+    - 다중 구현 규칙
+        - 속성 ⇒ 일치하지 않으면 error
+        - 속성&함수 ⇒ 함수가 이긴다
+        - 함수&함수 ⇒ ContraVariance (작은쪽에 맞춤)
+    - interface 상속 규칙
+        - 함수는 contraVariance로 상속 가능 (부모 > 자식)
+        - 함수 override의 경우에도 contra-variance 함수가 아닌 속성은 일치하지 않으면 error
