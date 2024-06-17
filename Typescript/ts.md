@@ -699,6 +699,17 @@ const ud3: Ud2 = { id: 1, dname: 'HH', captain: 'HH', addr: 'Seoul' };
 
 ## 클래스
 
+### 클래스 메서드
+
+- 매개변서 타입 기본값: any 타입
+- 메서드 호출하려면 허용 가능한 수의 인수가 필요
+- 재귀함수가 아니면 대부분 반환 타입 유추 가능
+- 메서드 호출 시 올바튼 타입의 인수가 올바른 수로 제공되는지 확인하기 위해 타입 검사 실시
+
+### 클래스 속성
+
+- 클래스 속성을 읽거나 쓰려면 명시적으로 선언해야함
+
 ```tsx
 interface Animal {
   move(): void;
@@ -748,8 +759,6 @@ happy.kukuki();
 
 ```
 
-### 클래스 속성
-
 - UML에서 #은 protected, JS에서 #은 private (헷갈리지 X)
 
 ```tsx
@@ -794,7 +803,9 @@ class Pet implements Animal {
 }
 ```
 
-- 초기화 검사
+- 초기화 검사: StricktNullCheck On 상테에서 TS는 undefined 타입으로 선언된 각 속성이 생성자에서 할당되었는지 확인함
+
+- 모든 property는 초기화/ 정의 해야함 (`!`, `?` 제외)
 - 확실하게 할당된 속성 (non-null assertion): `!`
 
 ```tsx
@@ -863,7 +874,7 @@ class RandomQuote {
 
 ### 타입으로서의 클래스
 
-- TS는 구조적으로 타입을 체크함, 선언되는 방식이 아니라 객체의 형태만 고려하기 때문
+- TS는 구조적으로 타입을 체크함, 선언되는 방식이 아니라 객체의 형태만 고려하기 때문 (**구조적 타이핑**)
 - type, interface, class 모두 type alias로 들어갈 수 있음(`:` 뒤에 적히는 거)
 
 - ps) 다중상속 - mixin/trait(JS)
@@ -884,3 +895,390 @@ class RandomQuote {
     - interface 상속 규칙
         - 함수는 contraVariance로 상속 가능 (부모 > 자식)
         - 함수 override의 경우에도 contra-variance 함수가 아닌 속성은 일치하지 않으면 error
+
+---
+
+## 클래스 확장
+
+- 다른 클래스를 확장하거나 하위 클래스를 만드는 JS 개념에 타입 검사 추가
+- 기본 클래스에 선언된 모든 메서드나 속성은 파생 클래스라고도 하는 하위 클래스에서 사용할 수 있음
+
+```tsx
+// Teacher는 StudentTeacher 하위 클래스의 인스턴스에서 사용할 수 있는 teach 메서드를 선언
+class Teacher {
+    teach(){
+        console.log('teaching!');
+    }
+}
+
+class StudentTeacher extends Teacher {
+    learn(){
+        console.log('Learning!');
+    }
+}
+const teacher = new StudentTeacher();
+
+teacher.teach() // OK (기본 클래스에 정의됨)
+teacher.learn() // OK (하위 클래스에 정의됨)
+const t:StudentTeacher = new Teacher(); // Fail contra-variance
+const teacher:Teacher = new StudentTeacher(); // OK  co-variance
+```
+
+### 상속 - 할당 가능성 확장
+
+- 하위클래스도 기본 클래스의 멤버를 상속함
+- 하위 클래스의 인스턴스는 기본 클래스의 모든 멤버를 가지므로 기본 클래스의 인스턴스가 필요한 모든 곳에서 사용할 수 있음
+
+### 재정의(Override)된 생성자
+
+- 하위 클래스가 자체 생성자를 선언하면 super 키워드를 통해 기본 클래스 생성자를 호출해야 함
+
+### 재정의(override)된 메서드
+
+- 하위 클래스의 메서드가 기본 클래스의 메서드에 할당될 수 있는 한 하위 클래스는 기본 클래스와 동일한 이름으로 새 메서드를 다시 선언할 수 있음
+
+### 재정의 된 속성(멤버 변수)
+
+- 하위 클래스는 새 타입을 기본 클래스의 타입에 할당할 수 있는 한 동일한 이름으로 기본 클래스의 속성을 명시적으로 다시 선언할 수 있음
+- 재정의된 메서드와 마찬가지로 하위 클래스는 기본 클래스와 구조적으로 일치해야 함
+- 속성의 유니언 타입의 허용된 값 집합을 확장할 수 없음
+- 하위(자식) 클래스는 더 구체적(작아야)이어야 함!
+- 만약 확장 한다면 하위 클래스 속성은 더 이상 기본 클래스 속성 타입에 할당할 수 없음
+
+### 추상 클래스 (abstract class)
+
+- 일부 메서드를 구현하지 않고 대신 하위 클래스가 해당 메서드를 제공할 것을 예상하고 기본 클래스를 만드는 방법이 유용할 수 있음
+
+### 멤버 접근성
+
+- private 클래스 멤버는 해당 클래스 인스턴스에서만 접근할 수 있음
+- TS의 멤버 접근성(가시성, visibility)는 클래스 멤버의 선언 이름 앞에 다음 키워드 중 하나를 추가
+    - public(기본값): 모든 곳(외부, 하위)에서 접근 가능
+    - protected: 해당 클래스 내부/하위(자손) 클래스에서만 접근 가능
+    - private: 해당 클래스 내부에서만 접근 가능
+    
+    ⇒ 이 키워드는 type system 내에서만 존재함. JS로 컴파일되면 다른 모든 타입 시스템 구문과 함께 키워드도 제거됨. 따라서 JS에서 #(private)은 TS의 private과 다름.
+    
+
+```tsx
+
+```
+
+- 정적 필드 제한자, 멤버 속성 선언 생략 가능
+
+```tsx
+
+```
+
+---
+
+## 타입 제한자
+
+### top 타입
+
+- 모든 타입이 할당 가능한 타입
+- any / unknown
+- unknown 타입 값의 속성에 직접 접근할 수 없다면 어떻게 사용해야 하나?
+    
+    → instanceof나 typeof을 사용하여 타입을 내로잉 하거나, 타입 어서션을 통해 값의 타입이 제한된 경우에 해당 타입이 갖는 속성에 접근할 수 있다.
+    
+
+### 타입 서술어 (Type Predicate)
+
+- instanceof나 typeof를 통한 내로잉의 한계?
+    
+    → 내로잉 하는 로직을 함수로 감싸면 타입을 좁힐 수 없게된다.
+    
+- `user-defined type guard` : isString() 함수처럼 인자가 특정 타입인지 여부를 나타내기 위해 boolean 값을 반환하는 함수를 위한 구문
+- 주의: 타입 이상을 검사하는 경우 예상치 못한 결과를 얻을 수 있다
+
+### 타입 연산자
+
+- `typeof` : 제공되는 ‘값’의 타입을 반환
+- `keyof` : 존재하는 ‘타입’의 키를 바탕으로 유니언 타입을 생성
+- `keyof typeof` : 제공되는 값에 존재하는 키만 매개변수 타입으로 허용
+
+### 타입 어서션(as)
+
+- 값의 타입을 재정의한다. (확신할 수 있는 경우만)
+- localStorage에 저장되어있는 값을 가져와 파싱 후 해당 객체의 프로퍼티에 접근한다고 가정
+
+### catch 블록과 타입 어서션
+
+- catch 에러는 무조건 unknown
+- AxiosError처리 → <ServerValidationError>로 타입 강제 지정
+    
+    ```tsx
+    if (axios.isAxiosError<ServerValidationError>(error)){
+    	...
+    }
+    ```
+    
+
+### non-null 어서션
+
+- null 또는 undefined를 포함할 수 있는 변수에서 null과 undefined를 제거
+
+---
+
+## 제너릭
+
+### 제너릭 함수
+
+- `<T> (input: T)`
+- 호출하는 방식에 따라 다양한 타입으로 작동하도록 의도한다.
+- 함수랑 변수에서만 사용
+
+### 제너릭 인터페이스
+
+```tsx
+type Color = 'red' | 'blue' | 'green';
+type Address = { sigungu: string, zipcode: string };
+
+interface Info<T> { 
+	id: number,
+	name: string;
+	additional?: T; 
+}
+const info1: Info<Color> = { 
+	id: 1,
+	name: 'lim',
+	additional: 'red' 
+};
+const info2: Info<Address> = { 
+	id: 2,
+	name: 'hong',
+	additional: { sigungu: 'Seoul', zipcode: '04112'} 
+}
+
+interface MyNode<T> {
+	value: T;
+	next: MyNode<T> | null;
+}
+function push<T>(currNode: MyNode<T>, nextNode: MyNode<T>) {
+    currNode.next = nextNode;
+}
+function createNode<T>(value: T): MyNode<T> {
+	return {
+		value,
+		next: null 
+	}
+}
+const defaultNode = createNode({ name: 'lim', age: 25 }); 
+push(defaultNode, {
+	value: 'hong', // value: defaultNode2.value,
+	next: null
+});
+```
+
+### 제너릭 클래스
+
+```tsx
+class Factory<T> {
+	protected products: T[];
+	
+	constructor(product: T) { 
+		this.products = [product];
+	}
+	create(product: T) { 
+		this.products.push(product);
+	}
+	getProducts() {
+		return [...this.products];
+	}
+}
+
+const factory = new Factory({ name: 'KIA', description: 'car factory' });
+const products = factory.getProducts();
+```
+
+### 메서드 제너릭
+
+- 인스턴스와 무관하게 메소드에서 자체 제너릭 타입 사용 가능
+
+### 정적 클래스 제너릭
+
+- on static 사용 가능
+- static한 멤버 변수는 클래스 제너릭을 사용할 수 없다
+- new 해서 사용 가능
+
+### Generic type Alias - 제너릭 타입 별칭
+
+- interface, class와 마찬가지로 타입 별칭에 제너릭을 사용할 수 있다
+- `type SomeType<T> = …`
+
+### 판별된(discriminated) 유니언 “판별자”
+
+- isUser 사용
+
+### 제너릭 제한자 (기본값, 제한된 타입)
+
+1. 제너릭 기본값
+    
+    함수의 매개변수에 기본값을 제공하듯 제너릭 타입 매개변수에 기본 타입을 지정할 수 있다
+    
+    ```tsx
+    interface Pair<K, V = K> { 
+    	key: K;
+    	value: V; 
+    }
+    
+    const pair1: Pair<string, number> = { key: 'key', value: 10 }; 
+    const pair2: Pair<number> = { key: 1, value: 100 };
+    const pair3: Pair = { key: 'key', value: 'value' } // Error!
+    ```
+    
+2. 제한된 제너릭 타입(extends)
+    
+    extends 키워드를 사용해 T를 User타입인 user를 가지고 있는 타입으로 제한
+    
+    ```tsx
+    interface User {
+        id: number;
+        name: string;
+    }
+    interface Post {
+        id: number;
+        title: string;
+        content: string;
+        user: User;
+    }
+    interface Product {
+        id: number;
+        name: string;
+        price: number;
+    }
+    
+    const post = {
+    	id: 10,
+    	title: 'post',
+    	content: 'content',
+    	user: { id: 1, name: 'hong' },
+    };
+    const product = { id: 100, name: 'TV', price: 1000000 };
+    
+    // function getUserInfoX<T>(params: T) {
+    // return params.user; // Error!
+    // }
+    function getUserInfo<T extends { user: User }>(params: T) {
+    	return params.user;
+    }
+    	
+    getUserInfo(post);
+    // getUserInfo(product); // Error!
+    function getUserInfo2<T extends Post>(params: T) {
+    	return params.user; // Error? No! 
+    }
+    ```
+    
+
+### extends operator
+
+- `keyof` : 전체 키 대상
+- `<K extends keyof T>` : 해당 property의 키를 특정
+- `[x in keyof T]`
+- `keyof (T & K)` : 두 타입의 &(합친) 타입의 key들
+- `new Promise<string>` : 최종적으로 resolve된 값을 나타내는 단일 타입 매개변수를 갖는다. (Promise 선언 안하면 unknown이 기본 타입 인수)
+- `async function ...` : 반환 값이 Promise(Thenable)가 아닌 경우 Promise로 래핑된다. (반환 타입은 항상 Promise 타입)
+
+### 제너릭 황금률 / 제너릭 명명 규칙
+
+- 타입 매개변수가 최소 두 번 이상 사용되었는가?
+- 적어도 하나의 다른 매개변수 또는 함수의 반환 타입에서도 사용되었는가?
+
+<제너릭 명명규칙>
+
+1. 첫 번째 타입 인수로 T를 사용
+2. 후속 타입 매개변수가 존재하면 U, V 등을 사용
+3. 타입 인수가 어떻게 사용되어야 하는지 맥락과 관련된 정보가 알려진 경우 해당 용어의 첫 글자를 사용 (ex. 상태 관리 라이브러리: S, 키: K, 값: V)
+4. 여러 개의 타입 매개변수를 갖거나 목적이 명확하지 않는 경우 완전한 이름을 사용
+
+- valueof: `type State<T> = T[keyof T];`
+
+---
+
+## 선언 파일과 구성 및 옵션
+
+### 타입 선언 파일 (*.d.ts)
+
+```tsx
+lib.<target>.d.ts  // target: ES3, ES5, ES2020, ESNext, etc
+```
+
+### global 전역 변수
+
+- import/export가 없거나 declare global 이면 전역
+- `declare const VERSION: string;`
+- 전역 어디서나 import 없이 사용 가능
+- window 등 전역 객체에 타입 정의 가능
+- 
+
+```tsx
+// types/index.d.ts
+declare global {
+	interface Window {
+		gName: string;
+	}
+	interface Array<T> {
+		first(): T;
+	}
+}
+
+// index.html
+window.gName = 'Hong';
+console.log(window.gName);
+```
+
+### declare
+
+- `declare let identity: string;`
+- `declare function f(p: number);`
+- 오직 선언만, 값(초기값)은 허용되지 않는다. (: Ambient Context), literal type은 가능 (ex. `declare const x: ‘id’;`)
+- `declare module “module-name”`으로 TypeSystem에 module 알림
+    
+    ⇒ `import {x} from “module-name”; // 경로 필요없이 사용 가능`
+    
+
+### tsc and options
+
+- tsc
+
+```bash
+tsc --init
+tsc -w
+tsc --noEmit
+tsc -p path/.../tsconfig.json
+```
+
+- include & exclude: 포함할 파일과 제외할 파일 설정
+- JSX:*.tsx (tsconfig.json > compileOptions)
+    - preserve/ react/ react-native
+    - 주의) const arrwfn = <T>(x: T) => + x;
+- resolveJsonModule (tsconfig.json > compileOptions)
+    - import { LINE2 } from ‘../subways.json’;
+
+### 타입 검사 (Type Checker)
+
+- lib emitOption: 브라우저에서 실행되지 않는 경우 DOM, console 등을 제거
+    
+    `tsc -lib es2020`
+    
+    ```tsx
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    ```
+    
+- skipLibCheck: 사용되지 않는 소스에서의 선언은 선언 파일 타입 체크도 생략
+- strict (noImplicitAny, strictNullChecks, strictFuctionTypes 모두 활성화)
+    
+    `tsc --strict --noImplicitAny false`
+    
+    ```tsx
+    "noImplicitAny": false,
+    ```
+    
+- checkJs with allowJs
+    
+    ```tsx
+    "allowJs": true,
+    "checkJs": true,
+    ```
