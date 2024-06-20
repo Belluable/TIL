@@ -97,3 +97,56 @@ yarn preview  # (배포 버전) dist 폴더 내 html 보여줌, localhost:4173
 
 - 0.8rem: root(body)의 80%
 - 0.8em: 지금 있는 태그의 80%
+
+**React Component Props**
+
+- Props:
+    - props, childre (React.Node)
+    - 속성(변수, 함수 등) 전달
+    - `MyComponent.defaultProps = {…}`
+- Variables/ Function:
+    - 변경된다고 해서 re-rendering 영향 없음
+    - 렌더링될 때 한 번만 설정된다. 즉, 렌더링 후에 변경되지 않음
+- States
+    - 상태변경은 무조건 setState를 사용
+    - 부모의 상태가 변경되면, 그 상태를 참조하는 모든 자시 컴포넌트 re-render
+        
+        (부모가 다시 그려지면(re-render) 자식도 다시 그려지게 됨)
+        
+        → 상태를 통합하면 re-rendering은 더 많이 일어남 ⇒ 상태를 성격-연관성에 맞게 분리하자 (좁게 사용)
+        
+        단, Actual(Real Active) DOM은 해당 상태를 참조하는 부분만 다시 그린다. (paint & display)
+        
+- Component 정리
+    - 함수형 컴포넌트 == 순수 함수형 컴포넌트
+    - Container Component를 적절히 사용하자
+    - 데이터 가져오기와 그리기 분리
+    - 상태 공유 단위로 분리 (cf. useContext)
+    - 단순 담는 용도의 아주 깊은 container 금지 = container(context) 남발 금지
+    - 최대한 독립적으로 작성
+    - coupling을 최소화해서 단독으로 사용 가능하도록
+
+**Component LifeCycle**
+
+- 초기화는 처음 한 번만
+- index.jsx에서 React.StrictMode로 App이 감싸져 있으면 LifeCycle이 두번씩 호출됨(개발환경에서만)
+
+---
+
+## React Hooks
+
+- 디스트럭쳐링 때문에 props를 실무에서는 잘 안씀
+
+```jsx
+// My.jsx
+// export default function My(props) {...}
+
+export default function My({ session: { loginUser, cart }, signOut }) {
+  return (
+    <>
+      <strong className="text-green-500">{loginUser?.name}</strong> logined
+    </>
+  );
+}
+
+```
