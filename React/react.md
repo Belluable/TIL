@@ -150,3 +150,38 @@ export default function My({ session: { loginUser, cart }, signOut }) {
 }
 
 ```
+
+---
+
+### setCount
+
+- ex setCount(count+1)을 3번 불러도 실행되는 속도가 출력 속도보다 빨라서 결국 모든 결과 값이 setCount(1)이됨
+    
+    → setCount((count) ⇒ count+1); 로 변경해주면 됨: 16ms를 기다림
+    
+    ```jsx
+    setCount(count+1)
+    setCount(count+1)
+    setCount(count+1)
+    
+    setCount((count) => count+1)
+    setCount((count) => count+1)
+    setCount((count) => count+1)
+    ```
+    
+
+### useEffect
+
+- V-Dom → mount → paint → real-Dom
+- mount 후에 painting 되면서 실행
+
+### useLayoutEffect
+
+- mount 전에 실행
+
+```jsx
+// A가 바꼈을 때 실행해라
+useEffect(() => {
+	...
+}, [A]
+```
