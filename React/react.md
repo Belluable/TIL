@@ -93,7 +93,7 @@ yarn preview  # (배포 버전) dist 폴더 내 html 보여줌, localhost:4173
 - Templates: Organisms를 조합해서 만든 화면 레이아웃 (CSS)
 - Pages: Templates에 Data를 포함하여 완성된 최상위 컴포넌트
 
-**rem vs em**
+**rem vs em (css)**
 
 - 0.8rem: root(body)의 80%
 - 0.8em: 지금 있는 태그의 80%
@@ -133,25 +133,226 @@ yarn preview  # (배포 버전) dist 폴더 내 html 보여줌, localhost:4173
 
 ---
 
-## React Hooks
+### TailwindCSS in React
 
-- 디스트럭쳐링 때문에 props를 실무에서는 잘 안씀
+- 설치
+
+```bash
+# intall
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+- tailwind.config.js
 
 ```jsx
-// My.jsx
-// export default function My(props) {...}
-
-export default function My({ session: { loginUser, cart }, signOut }) {
-  return (
-    <>
-      <strong className="text-green-500">{loginUser?.name}</strong> logined
-    </>
-  );
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
 }
+```
 
+- index.css 아래 코드 추가
+
+```jsx
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 ```
 
 ---
+
+## React Hooks
+
+**: react의 상태 및 life-cyle 관리**
+
+- 상태관리 Hooks
+    - useState
+    - useContext (createContext)
+    - useReducer
+- 시점 Hooks
+    - useLayoutEffect (paint 전)
+    - useEffect (paint 후)
+- 메모화 Hooks
+    - useMemo
+    - useCallback
+    - memo
+- 그 외 Hooks
+    - useRef, useImperativeHandle
+    - useDebugValue, useId, useTra …
+- Hooks의 3원칙
+    1. 컴포넌트 영역 안에서만 작동한다.
+    컴포넌트/커스텀훅 내부에서만 호출해야함
+    2. 기능을 여러 훅으로 나누면 좋다.
+    나누어 있어도 컴포넌트에서 한번에 순차 호출
+    함수형 컴포넌트 ⇒ 함수 ⇒ 기능 단위 분히 ⇒ 가독성 ⇒ 테스트 및 유지보수에 유리
+    3. 컴포넌트의 최상위 레이어(스코프)에서만 호출해야한다.
+    블록 내부에서는 호출할 수 없음
+
+---
+
+## 상태관리 Hook
+
+### useState
+
+- `const [변수, 세터] = useState(초기값);`
+- react에 상태를 등록
+- 계속 observing함 → 상태가 바뀌면 다시 그려줘야해
+- 상태 값은 안바뀜: useState(false)
+- 메모리 공간 하나, 초기화 한번
+
+### useContext
+
+- 데이터(상태) 직항
+- Privider로 부터 Consumer까지 direct로 value(상태) 공유 (App → Profile)
+- Privider의 Children들은 해당 context의 상태를 바로 접근 가능
+- Context.Provider ~ Context.Consumer
+
+```jsx
+// context pattern 1 (render-prop)
+import {createContext} from 'react';
+const MyContext = createContext({x: 1});
+export MyContext;
+
+// context consumer
+import {MyContext} from '../myContext';
+<MyContext.Consumer>
+	{ (value) => <h1>x: {value.x}</h1> }
+</MyContext.Consumer>
+```
+
+```jsx
+// context pattern 2 (provider-useContext)
+export const MyContext = createContext();
+render(
+	<MyContext.Provider value={{xObj}}>
+		<App />
+	</MyContext.Provider>
+);
+
+// context consumer
+import { useContext } from 'react';
+import { MyContext } from '../MyContext';
+const {xObj} = useContext(MyContext)
+```
+
+- 상태를 공유하는 context (useState 보유)
+    - 상태가 변경되면 Provider와 모든 자식 component(Consumer) 다시 렌더링 됨
+    - setState를 바로 공유하지 말고 상태를 변경하는 함수를 전달하자 (ex. setCount가 아닌, plusCount 노출)
+
+### useReducer
+
+- 위험한 상태변경(setter) 그만
+    - reduce: 기존(현재) 값을 바탕으로 추가 액션 (”현재 값은 모르겠고, 아무튼 이 처리 해줘!”) ← 예측 가능한 처리
+    `[1, 2, 3].reduce((currSum, a) => currSum + a, 0);`
+    - reducer: 기존 값에 무엇인 액션을 해주는 함수
+    `setIsActive(!isActive); setCount(count => count + x);` → bad
+    `toggle(); plusCount(x);` → good
+    - 장점: setter를 직접적으로 노출하지 않으면서 함수를 컴포넌트 외부에 둘 수 있다.
+- 상태 관련 함수를 한곳에
+    - reducer: 같은 상태를 변경하는 함수들을 한곳에 모아 놓은 것
+    - dispatcher(action): action을 전달하는 함수(StrictMode에서는 2회 Call)
+    - 장점: 컴포넌트 외부에 상태 변경하는 함수(reducer)를 둘 수 있다
+
+## 시점 Hook
+
+- V-Dom → mount → paint → real-Dom
+
+![react_2](react/2.png)
+
+### useEffect
+
+- mount 후에 painting 되면서 실행
+- `useEffect(() => {수행코드 … ; return () => 정리코드;}, [의존관계배열: observer에 등록]);`
+
+### useLayoutEffect
+
+- rendering 직후 mount 전에 실행
+
+```jsx
+// A가 바꼈을 때 실행해라
+useEffect(() => {
+	...
+}, [A]
+```
+
+## 메모화 Hook
+
+### useMemo
+
+- 변수를 기억해둘게 (값을 캐시)
+- 변수를 Static 영역에 cache (value memoization)
+- 메모화된 변수는 이제 주소가 변하지 않음
+
+```jsx
+const 메모화된 변수 = useMemo(() => { 
+	비용이 드는 코드;
+	return 메모화할 값;
+}, [의존관계 변수들];
+```
+
+### Memo
+
+- 컴포넌트
+
+### useCallback
+
+- 함수를 기억해둘게 (함수 캐시) (function memoization)
+- 메모화된 함수는 자시 컴포넌트에서 re-render 시 재호출 방지 = 한번만 실행돼야하는 함수를 전달할 때 사용
+
+```jsx
+const 메모화된 함수 = useCallback(() => {
+	함수 코드;
+}, [의존관계 배열]);
+```
+
+## 그 외 Hook
+
+### useRef
+
+- `const xRef = useRef();`
+- 무엇이든 참조
+- 직점 DOM에 접근할 때는 날 불러
+- 화면에 영향을 주지 않음?
+- V-Dom은 ref를 observe 안함
+
+---
+
+## 기타
+
+- `console.debug` ⇒ build 할 때 없어짐
+- 디스트럭쳐링 때문에 props를 실무에서는 잘 안씀
+    
+    ```jsx
+    // My.jsx
+    // export default function My(props) {...}
+    
+    export default function My({ session: { loginUser, cart }, signOut }) {
+      return (
+        <>
+          <strong className="text-green-500">{loginUser?.name}</strong> logined
+        </>
+      );
+    }
+    
+    ```
+    
+
+### let
+
+- 계속 바껴도 되는거
+- 함수 부를때 마다 메모리 공간이 바뀜
+
+### setSession
+
+- setter 안에 re-render가 있어서 함수를 다시 부르고 다시 그림
 
 ### setCount
 
@@ -168,20 +369,3 @@ export default function My({ session: { loginUser, cart }, signOut }) {
     setCount((count) => count+1)
     setCount((count) => count+1)
     ```
-    
-
-### useEffect
-
-- V-Dom → mount → paint → real-Dom
-- mount 후에 painting 되면서 실행
-
-### useLayoutEffect
-
-- mount 전에 실행
-
-```jsx
-// A가 바꼈을 때 실행해라
-useEffect(() => {
-	...
-}, [A]
-```
