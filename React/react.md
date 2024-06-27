@@ -369,3 +369,30 @@ const 메모화된 함수 = useCallback(() => {
     setCount((count) => count+1)
     setCount((count) => count+1)
     ```
+
+---
+
+## React Styling
+
+1. 일반 CSS file
+2. styled-components 모듈
+3. classnames 모듈
+4. jss 모듈
+5. emotion 모듈
+6. [clsx](https://www.npmjs.com/package/clsx): 가장 많이 씀, `npm install --save clsx`
+
+---
+
+## Deployment and StoryBook
+
+### Deploy to Github
+
+- Github pages로 배포하기
+- `yarn add gh-pages -D`
+- package.json > script > `“deploy”: “gh-pages -d dist”` 추가
+
+### storybook
+
+- setup: 함수 캐시
+- `yarn storybook`
+- [https://storybook.js.org](https://storybook.js.org/)
