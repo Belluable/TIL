@@ -4,7 +4,7 @@
 
 - React-Base FullStack web development framwork
 
-## Next Rendering methods
+### Next Rendering methods
 
 1. SSG (static site generation)
     - build 시 미리 생성해놓기
@@ -37,6 +37,12 @@ npm i -D prettier eslint-config-prettier
 npm i -D @trivago/prettier-plugin-sort-imports
 ```
 
+## Route
+
+Layout > Template > Page > Component
+
+![next_1](next/1.png)
+
 ### Layout & Page
 
 ```bash
@@ -45,6 +51,107 @@ make app/hello/layout.tsx
 make app/hello/page.tsx
 nav to page from Home(app/page.tsx) 
 
+# start
 yarn dev
 yarn build
 ```
+
+### Link & next/navigation/useRouter & RouteGroups
+
+- Link (a tag는 자동 생성)
+    
+    `<**Link** **href**="/" **scroll**={false} **type**="button">Home</**Link**>`
+    
+- useRouter (only Client Component)
+    
+    ```tsx
+    // useRouter
+    import {useRouter} from 'next/navigation'
+    const router = useRouter()
+    router.push('/dashboard', {scroll: false});
+    
+    // another functions
+    router.back();
+    ```
+    
+- usePathname (only Client Component)
+    
+    ```tsx
+    // usePathname
+    import {usePathname} from 'next/navigation'
+    const pathname = usePathname()
+    ...
+    <Link href='...' className={pathname.endsWith(tm) ? 'text-blue-500' :'underline'}
+    ```
+    
+- redirect (Server Component)
+    
+    ```tsx
+    // usePathname
+    import {redirect} from 'next/navigation'
+    if (..)
+    	redirect('/login');
+    ```
+    
+- useSearchParam (only Client Component)
+    
+    ```tsx
+    // useSearchParam
+    import {useSearchParam} from 'next/navigation'
+    
+    // http://.../hello?id=99&name...
+    const searchParams = useSearchParams();
+    const urlsparams = new URLSearchParams(searchParams.toString());
+    const id = searchParams.get('id');
+    console.log('id:', id, searchParams, urlsparams);
+    
+    // update searchParams ex
+    const setSearchParams = (name: string, value: string) => {
+    	const params = new URLSearchParams(searchParams.toString());
+    	params.set(name, value);
+    	
+    	if (router && pathname) {
+    		return router.push(`${pathname}? ${params.toString()}`);
+    	}
+    	return params.toString();
+    }
+    ```
+    
+
+### 라우터
+
+- A → B로 바뀌는 것
+- 라우터 느낌이 나는건 다 폴더로
+
+### 포트
+
+- http: 80
+- https: 443
+- was: 8000 (막아둠)
+
+### WS vs WAS
+
+- ws:
+- was:
+
+- useCallback: 함수를 memoization
+- overay: 제일 바깥쪽 - w, h 전체 배경(보통 어둡게 함)
+- wrapper: div 덧싼거, z-10하면 전체를 덮음
+
+### Dynamic Routes
+
+- Dynamic Routes for Static Pre-creating (SSG)
+- Nested Dynamic Routes
+
+### @parallel Routes
+
+- @parallel routing ex
+- Unmatched Routes in Parallel Routes
+- Unmatched Routes (Root Default Page)
+- Parallel with Conditional Routes
+
+### Intercepting Routes
+
+### Modal component (tailwindcss)
+
+- components/Modal.tsx
