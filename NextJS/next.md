@@ -155,3 +155,49 @@ yarn build
 ### Modal component (tailwindcss)
 
 - components/Modal.tsx
+
+## CSR, SSR, SSG, ISR
+
+ssg: default
+
+ssr: 실시간 반영 ex. 주식
+
+isr: 정해준 시간마다 한번씩 새로고침 → 서버가 안바빠짐
+
+### headless
+
+- bootstrap, tailwind 필요 없이 몸통만 있으면 됨
+- ex. daisyUI, shadcn(젤 많이 씀)
+    - [https://daisyui.com](https://daisyui.com/)
+    - [https://ui.shadcn.com](https://ui.shadcn.com/)
+- shadcn은 radix-ui 기반
+
+### device route ⭐면접
+
+- device: 마지막 호출로부터 정해진 시간 후에 호출
+
+## NextAuth 소셜 로그인
+
+서버에 API route가 원격에 있다고 생각하면 됨
+
+fetch하면 jsonplaceholder에 부르는거 처럼 내 서버에 부르면 됨
+
+clien-server는 method로 통신함: GET, POST, PUT, PATCH, DELETE, OPTIONS
+
+error: 200, 300-not modified, 400-not found, 500번대
+
+options라는 메소드를 먼저 보냄
+
+캐시된 last modified를 불러옴 → 303 error→ 화면이 안바뀜 다시 불러와야함
+
+```bash
+# version이 바껴도 코드를 안바꿔도 됨
+yarn add next-auth@beta
+
+# 암호화하는 방식
+openssl rand -base64 32
+```
+
+google login 연결하기
+
+[https://authjs.dev/reference/core/providers/google](https://authjs.dev/reference/core/providers/google)
