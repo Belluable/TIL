@@ -77,3 +77,56 @@ Start Date: 2024년 7월 8일
 - 전체적인 구성: browser, NginX, node, pm2, RDS(sql)
     
     ![linux_8](linux/8.png)
+
+### AWS 서버 설치
+
+- 내 PC에서 EC2 들어가기
+    
+    ```bash
+    # 터미널에서 EC2 들어가기 내거 저장
+    ssh -i seocho.pem ec2-user@13.54.113.219
+    ```
+    
+- EC2 터미널 앞에 보여지는 경로 테마 수정 :
+    
+    ```bash
+    # vi bash_profile 
+    export PS1='\e[0;33m[\t:\u \w]$ \e[m'
+    ```
+    
+
+### Install NginX by dnf
+
+```bash
+ec2-user> sudo dnf install nginx
+
+# 포트 확인, telnet 설치
+ec2-user> sudo dnf install telnet
+ec2-user> telnet localhost 80
+
+# ps: 작업 관리자에 뭐가 떠있나 봄, grep: 찾음(필터링)
+ec2-user> ps -ef | grep nginx
+
+# 실행
+sudo nginx
+# nginx의 홈디렉토리, nginx가 설치돼있는 곳
+cd /etc/nginx/
+```
+
+ssh: telnet을 한번 더 암호화함
+
+telnet: 내가 나를 부름
+
+EC2 - yarn 설치
+
+[https://velog.io/@whdgnszz1/AWS-AWS-EC2-Amazon-Linux-에Node.js-yarn패키지-설치하기](https://velog.io/@whdgnszz1/AWS-AWS-EC2-Amazon-Linux-%EC%97%90Node.js-yarn%ED%8C%A8%ED%82%A4%EC%A7%80-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0)
+
+## Client Settings
+
+## 필수 명령어 및 Linux 구성
+
+(NW, Disk, …)
+
+## Shell Script
+
+## 실무에서 알면 편한 기술
